@@ -1,0 +1,34 @@
+# Ignore compiled files
+*.pyc
+
+# Ignore virtual environment
+env/
+
+# Ignore logs
+*.log
+
+# Ignore temporary files
+*.tmp
+
+# Ignore build artifacts
+build/
+dist/
+
+# Ignore configuration files
+*.config
+
+# Ignore node_modules folder
+node_modules/
+
+# Ignore package-lock.json
+package-lock.json
+
+# Ignore .DS_Store (macOS)
+*.DS_Store
+
+# Ignore .env files
+.env
+.env.example
+
+# Ignore .gitignore_example
+.gitignore_example
