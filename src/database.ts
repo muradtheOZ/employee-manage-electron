@@ -43,9 +43,7 @@ interface Employee {
     extraFields?: ExtraField[]; // Optional, assuming additional fields are dynamic
 }
 
-// Drop and recreate the table if necessary for debugging
-db.prepare('DROP TABLE IF EXISTS employees').run();
-db.prepare('DROP TABLE IF EXISTS employee_fields').run();
+
 
 // Create tables with UUID as the primary key
 db.prepare(`
