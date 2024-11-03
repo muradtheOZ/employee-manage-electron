@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "src/main.js",
   "scripts": {
-    "build": "webpack",
+    "build": "tsc && webpack",
     "start": "concurrently \"npm run watch:electron\" \"npm run watch:renderer\"",
     "watch:electron": "nodemon --exec \"npm run build && electron .\" --watch src",
     "watch:renderer": "webpack --watch"
@@ -21,7 +21,8 @@
     "react-dom": "^18.3.1",
     "react-paginate": "^8.2.0",
     "react-table": "^7.8.0",
-    "tailwindcss": "^3.4.14"
+    "tailwindcss": "^3.4.14",
+    "uuid": "^11.0.2"
   },
   "devDependencies": {
     "@types/node": "^22.8.6",

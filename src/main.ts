@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
-import { addEmployee, getAllEmployees, deleteEmployee, updateEmployee } from './database';
+import { addEmployee, getAllEmployees, deleteEmployeeById, updateEmployee } from './database';
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -19,5 +19,5 @@ app.on('ready', createWindow);
 
 ipcMain.handle('getAllEmployees', () => getAllEmployees());
 ipcMain.handle('addEmployee', (event, employee) => addEmployee(employee));
-ipcMain.handle('deleteEmployee', (event, id) => deleteEmployee(id));
+ipcMain.handle('deleteEmployeeById', (event, uuid) => deleteEmployeeById(uuid));
 ipcMain.handle('updateEmployee', (event, employee) => updateEmployee(employee));

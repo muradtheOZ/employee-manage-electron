@@ -1,3 +1,4 @@
+// EmployeeList.tsx
 import React, { useMemo, useState } from 'react';
 import { useTable, Column, HeaderGroup, ColumnInstance, Cell } from 'react-table';
 import ReactPaginate from 'react-paginate';
@@ -8,7 +9,7 @@ interface ExtraField {
 }
 
 interface Employee {
-  id?: number;
+  id?: string; // Use `uuid` instead of `id`
   name: string;
   age: number;
   position: string;
@@ -17,18 +18,23 @@ interface Employee {
 
 interface EmployeeListProps {
   employees: Employee[];
+  handleDelete: (uuid?: string) => void; // Updated to accept `uuid`
 }
 
-const EmployeeList: React.FC<EmployeeListProps> = ({ employees }) => {
+const EmployeeList: React.FC<EmployeeListProps> = ({ employees, handleDelete }) => {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 5;
 
+  // Filtered employees based on search query
   const filteredEmployees = employees.filter(employee =>
-    employee.name.toLowerCase().includes(search.toLowerCase()) ||
-    employee.position.toLowerCase().includes(search.toLowerCase())
+    (employee.name && employee.name.toLowerCase().includes(search.toLowerCase())) ||
+    (employee.position && employee.position.toLowerCase().includes(search.toLowerCase()))
   );
 
+  console.log('Here is the ',filteredEmployees);
+
+  // Pagination logic
   const pageCount = Math.ceil(filteredEmployees.length / itemsPerPage);
   const handlePageClick = (data: { selected: number }) => {
     setCurrentPage(data.selected);
@@ -38,25 +44,35 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees }) => {
     (currentPage + 1) * itemsPerPage
   );
 
-  const columns = useMemo<Column<Employee>[]>(
-    () => [
-      { Header: 'ID', accessor: 'id' as keyof Employee },
-      { Header: 'Name', accessor: 'name' as keyof Employee },
-      { Header: 'Age', accessor: 'age' as keyof Employee },
-      { Header: 'Position', accessor: 'position' as keyof Employee },
-      {
-        Header: 'Extra Fields',
-        accessor: 'extraFields' as keyof Employee,
-        Cell: ({ cell }: { cell: { value: ExtraField[] } }) =>
-          cell.value ? cell.value.map((field, index) => (
-            <div key={index}>
-              <strong>{field.key}:</strong> {field.value}
-            </div>
-          )) : null
-      },
-    ],
-    []
-  );
+  // Columns for the table
+  const columns = useMemo<Column<Employee>[]>(() => [
+    { Header: 'Id', accessor: 'id' as keyof Employee }, // Display UUID
+    { Header: 'Name', accessor: 'name' as keyof Employee },
+    { Header: 'Age', accessor: 'age' as keyof Employee },
+    { Header: 'Position', accessor: 'position' as keyof Employee },
+    {
+      Header: 'Extra Fields',
+      accessor: 'extraFields' as keyof Employee,
+      Cell: ({ cell }: { cell: { value: ExtraField[] } }) =>
+        cell.value ? cell.value.map((field, index) => (
+          <div key={index}>
+            <strong>{field.key}:</strong> {field.value}
+          </div>
+        )) : null,
+    },
+    {
+      Header: 'Actions',
+      accessor: 'actions' as keyof Employee, // Dummy accessor to satisfy Column type
+      Cell: ({ row }: { row: { original: Employee } }) => (
+        <button
+          onClick={() => handleDelete(row.original.id)} // Use `uuid` here
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded transition duration-200 ease-in-out"
+        >
+          Delete
+        </button>
+      ),
+    }
+  ], [handleDelete]);
 
   const {
     getTableProps,
@@ -72,6 +88,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees }) => {
   return (
     <div className="p-4">
       <h2 className="text-2xl font-semibold mb-4">Employee List</h2>
+      {/* Search input */}
       <input
         type="text"
         placeholder="Search by name or position..."
@@ -80,6 +97,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees }) => {
         className="w-full p-2 border border-gray-300 rounded mb-4"
       />
 
+      {/* Table */}
       <table {...getTableProps()} className="w-full border-collapse mb-4">
         <thead>
           {headerGroups.map((headerGroup: HeaderGroup<Employee>) => (
@@ -114,6 +132,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees }) => {
         </tbody>
       </table>
 
+      {/* Pagination */}
       <ReactPaginate
         previousLabel={'← Prev'}
         nextLabel={'Next →'}

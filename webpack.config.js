@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/renderer/index.tsx', // Adjust if your main renderer file is in a different path
+  entry: './src/renderer/index.js', // Adjust if your main renderer file is in a different path
   output: {
     path: path.resolve(__dirname, 'dist'), // Output directory for bundle.js
     filename: 'bundle.js', // Output filename

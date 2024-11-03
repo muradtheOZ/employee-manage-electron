@@ -3,14 +3,13 @@ import EmployeeForm from './components/EmployeeForm';
 import EmployeeList from './components/EmployeeList';
 import './index.css';
 
-
 interface ExtraField {
   key: string;
   value: string;
 }
 
 interface Employee {
-  id?: number;
+  uuid?: string; // Use `uuid` instead of `id`
   name: string;
   age: number;
   position: string;
@@ -26,39 +25,61 @@ const App: React.FC = () => {
     fetchEmployees();
   }, []);
 
+  // Fetches all employees from the backend
   const fetchEmployees = async () => {
     const employees = await window.electron.invoke('getAllEmployees');
     setEmployees(employees);
   };
 
+  // Handles adding a new employee
   const handleAddEmployee = async (event: React.FormEvent) => {
     event.preventDefault();
     const employeeWithExtras = { ...newEmployee, extraFields };
-    console.log("Adding new employee:", employeeWithExtras);  // Debug log
 
-    await window.electron.invoke('addEmployee', employeeWithExtras);
+    await window.electron.invoke('addEmployee',employeeWithExtras)
+
+    // Clear form and refresh employee list, which should include UUIDs
     setNewEmployee({ name: '', age: 0, position: '', extraFields: [] });
     setExtraFields([]);
-
-    fetchEmployees();  // Refresh employee list after adding
+    fetchEmployees();  // This should fetch employees with UUIDs
   };
+
+
+
+  // Handles canceling the employee form
   const handleCancel = () => {
-    // Clear form fields or navigate back
+    // Clear form fields
     setNewEmployee({ name: '', age: 0, position: '' });
     setExtraFields([]);
-    // Additional actions can be added here if needed
   };
 
-
+  // Updates the extra fields array when modified
   const handleExtraFieldChange = (index: number, field: 'key' | 'value', value: string) => {
     const updatedFields = [...extraFields];
     updatedFields[index][field] = value;
     setExtraFields(updatedFields);
   };
 
+  // Adds a new blank extra field
   const addExtraField = () => {
-    console.log("Adding extra field value");  // Debug log
     setExtraFields([...extraFields, { key: '', value: '' }]);
+  };
+
+  // Deletes an employee by UUID
+  const handleDelete = async (uuid?: string) => {
+    console.log("Deleting employee with UUID:", uuid);
+    if (!uuid) return;
+    try {
+      // Delete the employee in the backend
+      await window.electron.invoke('deleteEmployeeById', uuid);
+      console.log("Deleted employee with UUID:", uuid);
+
+      // Update state to remove the deleted employee
+      const updatedEmployees = employees.filter(employee => employee.uuid !== uuid);
+      setEmployees(updatedEmployees);
+    } catch (e) {
+      console.error('Error deleting employee:', e);
+    }
   };
 
   return (
@@ -73,7 +94,7 @@ const App: React.FC = () => {
         handleAddEmployee={handleAddEmployee}
         handleCancel={handleCancel}
       />
-      <EmployeeList employees={employees} />
+      <EmployeeList employees={employees} handleDelete={handleDelete} />
     </div>
   );
 };

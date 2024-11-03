@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 const Database = require('better-sqlite3');
 import * as path from 'path';
 
@@ -10,18 +11,21 @@ interface ExtraField {
 }
 
 interface Employee {
-    id?: number; // `id` might be optional if not provided initially
+    uuid?: string; // UUID as the unique identifier
     name: string;
     age: number;
     position: string;
     extraFields?: ExtraField[]; // Optional, assuming additional fields are dynamic
 }
 
+// Drop and recreate the table if necessary for debugging
+db.prepare('DROP TABLE IF EXISTS employees').run();
+db.prepare('DROP TABLE IF EXISTS employee_fields').run();
 
-// Create tables
+// Create tables with UUID as the primary key
 db.prepare(`
   CREATE TABLE IF NOT EXISTS employees (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    uuid TEXT PRIMARY KEY,    -- Use UUID as primary key
     name TEXT,
     age INTEGER,
     position TEXT
@@ -30,73 +34,78 @@ db.prepare(`
 
 db.prepare(`
   CREATE TABLE IF NOT EXISTS employee_fields (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    employee_id INTEGER,
+    employee_uuid TEXT,
     field_name TEXT,
     field_value TEXT,
-    FOREIGN KEY(employee_id) REFERENCES employees(id)
+    FOREIGN KEY(employee_uuid) REFERENCES employees(uuid) ON DELETE CASCADE
   )
 `).run();
 
 // CRUD functions
-// Adds a new employee to the database
 
+// Fetches all employees with their extra fields
 export function getAllEmployees(): Employee[] {
-    // Type cast the result of the query to Employee[]
     const employees = db.prepare(`SELECT * FROM employees`).all() as Employee[];
 
+    if (!employees) {
+        return [];
+    }
     for (const employee of employees) {
         // Fetch and assign extra fields for each employee
-        const extraFields = db.prepare(`SELECT field_name as key, field_value as value FROM employee_fields WHERE employee_id = ?`).all(employee.id) as ExtraField[];
+        const extraFields = db.prepare(`SELECT field_name as key, field_value as value FROM employee_fields WHERE employee_uuid = ?`).all(employee.uuid) as ExtraField[];
         employee.extraFields = extraFields;
     }
 
     return employees;
 }
 
-export default db;
+// Adds a new employee to the database with a generated UUID
+export function addEmployee(employee: Employee): Employee {
+    const uuid = uuidv4(); // Generate a new UUID
+    console.log("Generated UUID:", uuid, "for new employee:", employee); // Debug log to confirm UUID
 
+    db.prepare(`INSERT INTO employees (uuid, name, age, position) VALUES (?, ?, ?, ?)`)
+        .run(uuid, employee.name, employee.age, employee.position);
 
-export function addEmployee(employee: Employee): number {
-    const result = db.prepare(`INSERT INTO employees (name, age, position) VALUES (?, ?, ?)`)
-        .run(employee.name, employee.age, employee.position);
-
-    const employeeId = result.lastInsertRowid as number;
+    // Verify that the UUID is being inserted
+    const insertedEmployee = db.prepare(`SELECT * FROM employees WHERE uuid = ?`).get(uuid);
+    console.log("Inserted Employee:", insertedEmployee); // Log to verify insertion
 
     if (employee.extraFields) {
         for (const field of employee.extraFields) {
-            db.prepare(`INSERT INTO employee_fields (employee_id, field_name, field_value) VALUES (?, ?, ?)`)
-                .run(employeeId, field.key, field.value);
+            db.prepare(`INSERT INTO employee_fields (employee_uuid, field_name, field_value) VALUES (?, ?, ?)`)
+                .run(uuid, field.key, field.value);
         }
     }
 
-    return employeeId;
+    // Return the full employee object with UUID
+    return { ...employee, uuid };
 }
 
-// Deletes an employee by ID
-export function deleteEmployee(id: number) {
-    db.prepare(`DELETE FROM employees WHERE id = ?`).run(id);
-    db.prepare(`DELETE FROM employee_fields WHERE employee_id = ?`).run(id);
+// Deletes an employee by UUID
+export function deleteEmployeeById(uuid: string) {
+    db.prepare(`DELETE FROM employees WHERE uuid = ?`).run(uuid);
+    db.prepare(`DELETE FROM employee_fields WHERE employee_uuid = ?`).run(uuid);
 }
 
-// Updates an employee's information
+// Updates an employee's information by UUID
 export function updateEmployee(employee: Employee) {
-    if (!employee.id) {
-        throw new Error("Employee ID is required to update.");
+    if (!employee.uuid) {
+        throw new Error("Employee UUID is required to update.");
     }
 
-    db.prepare(`UPDATE employees SET name = ?, age = ?, position = ? WHERE id = ?`)
-        .run(employee.name, employee.age, employee.position, employee.id);
+    db.prepare(`UPDATE employees SET name = ?, age = ?, position = ? WHERE uuid = ?`)
+        .run(employee.name, employee.age, employee.position, employee.uuid);
 
-    db.prepare(`DELETE FROM employee_fields WHERE employee_id = ?`).run(employee.id);
+    // Delete and re-insert extra fields to handle updates
+    db.prepare(`DELETE FROM employee_fields WHERE employee_uuid = ?`).run(employee.uuid);
 
     if (employee.extraFields) {
         for (const field of employee.extraFields) {
-            db.prepare(`INSERT INTO employee_fields (employee_id, field_name, field_value) VALUES (?, ?, ?)`)
-                .run(employee.id, field.key, field.value);
+            db.prepare(`INSERT INTO employee_fields (employee_uuid, field_name, field_value) VALUES (?, ?, ?)`)
+                .run(employee.uuid, field.key, field.value);
         }
     }
 }
 
-
-
+export default db;
