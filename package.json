@@ -1,13 +1,14 @@
 {
   "name": "december",
   "version": "1.0.0",
-  "main": "src/main.js",
+  "main": "dist/main.js",
   "scripts": {
     "build": "tsc && webpack",
-    "start": "npm run build && concurrently \"npm run watch:electron\" \"npm run watch:renderer\"",
+    "start": "concurrently \"npm run watch:electron\" \"npm run watch:renderer\"",
     "watch:electron": "nodemon --exec \"npm run build && electron .\" --watch src",
-    "watch:renderer": "webpack --watch"
-  },
+    "watch:renderer": "webpack --watch",
+    "clear-cache": "rm -rf dist && rm -rf node_modules && npm install"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",

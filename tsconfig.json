@@ -9,6 +9,6 @@
     "esModuleInterop": true,           // Support for CommonJS and ES modules
     "skipLibCheck": true               // Skip type checking of declaration files
   },
-  "include": ["src/**/*"],             // Include all .ts and .tsx files in src
+  "include": ["src/**/*", "dist/preload.js"],             // Include all .ts and .tsx files in src
   "exclude": ["node_modules", "dist"]  // Exclude output and dependencies
 }

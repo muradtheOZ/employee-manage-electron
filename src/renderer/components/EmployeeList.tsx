@@ -9,7 +9,7 @@ interface ExtraField {
 }
 
 interface Employee {
-  id?: string; // Use `uuid` instead of `id`
+  uuid?: string; // Use `uuid` instead of `id`
   name: string;
   age: number;
   position: string;
@@ -46,7 +46,6 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, handleDelete }) 
 
   // Columns for the table
   const columns = useMemo<Column<Employee>[]>(() => [
-    { Header: 'Id', accessor: 'id' as keyof Employee }, // Display UUID
     { Header: 'Name', accessor: 'name' as keyof Employee },
     { Header: 'Age', accessor: 'age' as keyof Employee },
     { Header: 'Position', accessor: 'position' as keyof Employee },
@@ -65,7 +64,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, handleDelete }) 
       accessor: 'actions' as keyof Employee, // Dummy accessor to satisfy Column type
       Cell: ({ row }: { row: { original: Employee } }) => (
         <button
-          onClick={() => handleDelete(row.original.id)} // Use `uuid` here
+          onClick={() => handleDelete(row.original.uuid)} // Use `uuid` here
           className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded transition duration-200 ease-in-out"
         >
           Delete
