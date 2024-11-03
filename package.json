@@ -1,14 +1,43 @@
 {
-  "name": "december",
+  "name": "employee-management",
   "version": "1.0.0",
   "main": "dist/main.js",
+  "build": {
+    "appId": "com.example.employee-manager",
+    "productName": "Employee Manager beta One",
+    "directories": {
+      "output": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*",
+      "data/**/*",
+      "index.html",
+      "preload.js"
+    ],
+    "extraResources": [
+      {
+        "from": "./data/",
+        "to": "data"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "public/icons/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "public/icons/icon.icns"
+    }
+  },
   "scripts": {
-    "build": "tsc && webpack",
-    "start": "concurrently \"npm run watch:electron\" \"npm run watch:renderer\"",
+    "build": "cross-env NODE_ENV=production tsc && webpack",
+    "start": "cross-env NODE_ENV=development electron .",
+    "dist": "npm run build && electron-builder",
     "watch:electron": "nodemon --exec \"npm run build && electron .\" --watch src",
     "watch:renderer": "webpack --watch",
     "clear-cache": "rm -rf dist && rm -rf node_modules && npm install"
-},
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -32,6 +61,8 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "concurrently": "^9.0.1",
+    "copy-webpack-plugin": "^12.0.2",
+    "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
     "electron": "^33.0.2",
     "electron-builder": "^25.1.8",

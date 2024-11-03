@@ -1,26 +1,34 @@
-const path = require('path');
+const path = require("path");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
-  entry: './src/renderer/index.js', // Adjust if your main renderer file is in a different path
+  entry: "./src/renderer/index.js", // Adjust to your main React entry file
   output: {
-    path: path.resolve(__dirname, 'dist'), // Output directory for bundle.js
-    filename: 'bundle.js', // Output filename
+    path: path.resolve(__dirname, "dist"),
+    filename: "renderer.js",
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: [".ts", ".tsx", ".js", ".jsx"],
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
         exclude: /node_modules/,
+        use: "ts-loader",
       },
       {
-        test: /\.css$/i,  // This rule applies to .css files
-        use: ['style-loader', 'css-loader', 'postcss-loader'], // Loaders to process CSS and Tailwind directives
+        test: /\.css$/,
+        use: ["style-loader", "css-loader", "postcss-loader"],
       },
     ],
   },
-  target: 'electron-renderer', // Make sure this is set for Electron
+  target: "electron-renderer",
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "public/index.html", to: "index.html" }, // Copy index.html to dist folder
+      ],
+    }),
+  ],
 };

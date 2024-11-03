@@ -1,8 +1,33 @@
 import { v4 as uuidv4 } from 'uuid';
 const Database = require('better-sqlite3');
+import { app } from 'electron';
 import * as path from 'path';
+import { existsSync, copyFileSync, mkdirSync } from 'fs';
 
-const dbPath = path.join(__dirname, '..', 'data', 'employee_data.db');
+
+
+const isDevelopment = process.env.NODE_ENV === 'development';
+const dbPath = isDevelopment
+    ? path.join(__dirname, '..', 'data', 'employee_data.db') // Development path
+    : path.join(app.getPath('userData'), 'employee_data.db'); // Production path
+
+if (!isDevelopment) {
+    const userDataPath = app.getPath('userData');
+    if (!existsSync(userDataPath)) {
+        mkdirSync(userDataPath, { recursive: true });
+    }
+
+    // Copy template database if it doesn't exist
+    if (!existsSync(dbPath)) {
+        const devDbPath = path.join(__dirname, '..', 'data', 'employee_data.db');
+        if (existsSync(devDbPath)) {
+            copyFileSync(devDbPath, dbPath);
+        } else {
+            console.error("Development database template not found.");
+        }
+    }
+}
+
 const db = new Database(dbPath);
 
 interface ExtraField {
