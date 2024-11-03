@@ -4,7 +4,7 @@
   "main": "src/main.js",
   "scripts": {
     "build": "tsc && webpack",
-    "start": "concurrently \"npm run watch:electron\" \"npm run watch:renderer\"",
+    "start": "npm run build && concurrently \"npm run watch:electron\" \"npm run watch:renderer\"",
     "watch:electron": "nodemon --exec \"npm run build && electron .\" --watch src",
     "watch:renderer": "webpack --watch"
   },
@@ -25,6 +25,8 @@
     "uuid": "^11.0.2"
   },
   "devDependencies": {
+    "@types/debug": "^4.1.12",
+    "@types/ms": "^0.7.34",
     "@types/node": "^22.8.6",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
