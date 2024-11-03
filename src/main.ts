@@ -1,35 +1,23 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
-
-let mainWindow: BrowserWindow | null;
+import { addEmployee, getAllEmployees, deleteEmployee, updateEmployee } from './database';
 
 function createWindow() {
-  mainWindow = new BrowserWindow({
+  const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.js'), // Uses preload for secure IPC
       contextIsolation: true,
     },
   });
 
   mainWindow.loadURL(`file://${path.join(__dirname, '../public/index.html')}`);
-
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
 }
 
 app.on('ready', createWindow);
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-app.on('activate', () => {
-  if (mainWindow === null) {
-    createWindow();
-  }
-});
+ipcMain.handle('getAllEmployees', () => getAllEmployees());
+ipcMain.handle('addEmployee', (event, employee) => addEmployee(employee));
+ipcMain.handle('deleteEmployee', (event, id) => deleteEmployee(id));
+ipcMain.handle('updateEmployee', (event, employee) => updateEmployee(employee));

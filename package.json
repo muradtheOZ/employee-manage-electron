@@ -1,17 +1,20 @@
 {
   "name": "december",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "watch:electron": "nodemon --exec \"npm run build && electron .\" --watch src",
+    "watch:renderer": "webpack --watch",
+    "start": "concurrently \"npm run watch:electron\" \"npm run watch:renderer\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "better-sqlite3": "^11.5.0",
     "electorn": "^0.0.1-security",
-    "electron": "^33.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
@@ -19,7 +22,14 @@
     "@types/node": "^22.8.6",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "concurrently": "^9.0.1",
+    "electron": "^33.0.2",
     "electron-builder": "^25.1.8",
-    "typescript": "^5.6.3"
+    "electron-rebuild": "^3.2.9",
+    "nodemon": "^3.1.7",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.6.3",
+    "webpack": "^5.96.1",
+    "webpack-cli": "^5.1.4"
   }
 }
