@@ -42,6 +42,12 @@ const App: React.FC = () => {
 
     fetchEmployees();  // Refresh employee list after adding
   };
+  const handleCancel = () => {
+    // Clear form fields or navigate back
+    setNewEmployee({ name: '', age: 0, position: '' });
+    setExtraFields([]);
+    // Additional actions can be added here if needed
+  };
 
 
   const handleExtraFieldChange = (index: number, field: 'key' | 'value', value: string) => {
@@ -65,6 +71,7 @@ const App: React.FC = () => {
         handleExtraFieldChange={handleExtraFieldChange}
         addExtraField={addExtraField}
         handleAddEmployee={handleAddEmployee}
+        handleCancel={handleCancel}
       />
       <EmployeeList employees={employees} />
     </div>
