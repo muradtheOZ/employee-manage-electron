@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import EmployeeForm from './components/EmployeeForm';
 import EmployeeList from './components/EmployeeList';
+import './index.css';
+
 
 interface ExtraField {
   key: string;

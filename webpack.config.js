@@ -1,13 +1,13 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/renderer/index.tsx', // Entry point for your React app
+  entry: './src/renderer/index.tsx', // Adjust if your main renderer file is in a different path
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'), // Ensure this matches the location you’re using in HTML
+    path: path.resolve(__dirname, 'dist'), // Output directory for bundle.js
+    filename: 'bundle.js', // Output filename
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js'],
+    extensions: ['.tsx', '.ts', '.js'],
   },
   module: {
     rules: [
@@ -16,6 +16,11 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
+      {
+        test: /\.css$/i,  // This rule applies to .css files
+        use: ['style-loader', 'css-loader', 'postcss-loader'], // Loaders to process CSS and Tailwind directives
+      },
     ],
   },
+  target: 'electron-renderer', // Make sure this is set for Electron
 };
