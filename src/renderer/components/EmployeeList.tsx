@@ -32,8 +32,6 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, handleDelete }) 
     (employee.position && employee.position.toLowerCase().includes(search.toLowerCase()))
   );
 
-  console.log('Here is the ',filteredEmployees);
-
   // Pagination logic
   const pageCount = Math.ceil(filteredEmployees.length / itemsPerPage);
   const handlePageClick = (data: { selected: number }) => {
@@ -44,7 +42,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, handleDelete }) 
     (currentPage + 1) * itemsPerPage
   );
 
-  // Columns for the table
+  // Columns for the table (excluding the row number column)
   const columns = useMemo<Column<Employee>[]>(() => [
     { Header: 'Name', accessor: 'name' as keyof Employee },
     { Header: 'Age', accessor: 'age' as keyof Employee },
@@ -101,6 +99,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, handleDelete }) 
         <thead>
           {headerGroups.map((headerGroup: HeaderGroup<Employee>) => (
             <tr {...headerGroup.getHeaderGroupProps()} className="bg-gray-100">
+              <th className="border border-gray-300 p-2 text-left font-semibold">No.</th>
               {headerGroup.headers.map((column: ColumnInstance<Employee>) => (
                 <th
                   {...column.getHeaderProps()}
@@ -113,15 +112,16 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, handleDelete }) 
           ))}
         </thead>
         <tbody {...getTableBodyProps()}>
-          {rows.map(row => {
+          {rows.map((row, rowIndex) => {
             prepareRow(row);
             return (
               <tr {...row.getRowProps()} className="hover:bg-gray-50">
+                {/* Row number */}
+                <td className="border border-gray-300 p-2">
+                  {currentPage * itemsPerPage + rowIndex + 1}
+                </td>
                 {row.cells.map((cell: Cell<Employee>) => (
-                  <td
-                    {...cell.getCellProps()}
-                    className="border border-gray-300 p-2"
-                  >
+                  <td {...cell.getCellProps()} className="border border-gray-300 p-2">
                     {cell.render('Cell')}
                   </td>
                 ))}

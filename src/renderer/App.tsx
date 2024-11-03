@@ -84,7 +84,6 @@ const App: React.FC = () => {
 
   return (
     <div>
-      <h1>Employee Management</h1>
       <EmployeeForm
         newEmployee={newEmployee}
         setNewEmployee={setNewEmployee}

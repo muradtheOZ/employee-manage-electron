@@ -25,9 +25,11 @@ declare module 'react-table' {
         }
 
         export interface Row<T extends object = {}> {
+            index: number;
             cells: Cell<T>[];
             getRowProps: () => any;
         }
+
 
         export interface Cell<T extends object = {}> {
             getCellProps: () => any;
